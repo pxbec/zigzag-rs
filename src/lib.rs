@@ -1,16 +1,30 @@
 #![no_std]
+
+//! # zigzag-rs
+//!
+//! Zigzag encoding/decoding for primitive integers.
+
 use num_traits::{AsPrimitive, PrimInt, Signed, Unsigned, One};
 
 pub trait ZigZag: Signed + PrimInt
 where Self: AsPrimitive<Self::UInt> {
 	type UInt: Unsigned + PrimInt + AsPrimitive<Self>;
 
+	/// Encode a signed integer into an unsigned integer using zigzag encoding.
+	///
+	/// Zigzag transforms signed integers into unsigned ones, assigning compact
+	/// codes to values with low absolute magnitude, regardless of sign:
+	///
+	/// `0 → 0, -1 → 1, 1 → 2, -2 → 3, ...`
 	#[inline]
 	fn encode(value: Self) -> Self::UInt {
 		let s = (value << 1) ^ (value >> ((size_of::<Self>() * 8) - 1));
 		s.as_()
 	}
 
+	/// Decode an unsigned zigzag-encoded integer back into its signed value.
+	///
+	/// This reverses the transformation performed by [encode](ZigZag::encode).
 	#[inline]
 	fn decode(value: Self::UInt) -> Self {
 		let shr = value >> 1;
