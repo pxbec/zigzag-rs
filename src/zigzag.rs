@@ -21,7 +21,7 @@ where
 
 	/// Decode an unsigned zigzag-encoded integer back into its signed value.
 	///
-	/// This reverses the transformation performed by [encode](ZigZag::encode).
+	/// This reverses the transformation performed by [`encode`](ZigZag::encode).
 	#[inline]
 	fn decode(value: Self::UInt) -> Self {
 		let shr = value >> 1;
