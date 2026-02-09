@@ -53,13 +53,48 @@ impl_zigzag!(isize, usize);
 mod tests {
 	use super::*;
 	use pretty_assertions::assert_eq;
+	use rayon::prelude::*;
+
 
 	#[test]
-	fn all_i16_values() {
-		for i in i16::MIN..=i16::MAX {
-			let zig = ZigZag::encode(i);
-			let zag = ZigZag::decode(zig);
-			assert_eq!(i, zag);
+	fn i16_values() {
+		(i16::MIN..=i16::MAX)
+			.into_par_iter()
+			.for_each(|i| {
+				let i = i;
+				let zig = ZigZag::encode(i);
+				let zag = ZigZag::decode(zig);
+				assert_eq!(i, zag);
+			});
+	}
+
+	#[test]
+	fn i8_values() {
+		(i8::MIN as i16..=i8::MAX as i16)
+			.into_par_iter()
+			.for_each(|i| {
+				let i = i as i8;
+				let zig = ZigZag::encode(i);
+				let zag = ZigZag::decode(zig);
+				assert_eq!(i, zag);
+			});
+	}
+
+	#[test]
+	fn sample_values() {
+		let cases: &[(i32, u32)] = &[
+			(0, 0),
+			(-1, 1),
+			(1, 2),
+			(-2, 3),
+			(2, 4),
+			(i32::MAX, u32::MAX - 1),
+			(i32::MIN, u32::MAX),
+		];
+
+		for &(signed, encoded) in cases {
+			assert_eq!(encoded, ZigZag::encode(signed));
+			assert_eq!(signed, ZigZag::decode(encoded));
 		}
 	}
 }
