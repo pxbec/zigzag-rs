@@ -1,9 +1,9 @@
-use num_traits::{AsPrimitive, PrimInt, Signed, Unsigned, One};
-
+use num_traits::{AsPrimitive, One, PrimInt, Signed, Unsigned};
 
 pub trait ZigZag: Signed + PrimInt
 where
-	Self: AsPrimitive<Self::UInt>, Self: Sized
+	Self: AsPrimitive<Self::UInt>,
+	Self: Sized,
 {
 	type UInt: Unsigned + PrimInt + AsPrimitive<Self>;
 
@@ -32,13 +32,12 @@ where
 	}
 }
 
-
 macro_rules! impl_zigzag {
-    ($signed:ty, $unsigned:ty) => {
-        impl ZigZag for $signed {
-            type UInt = $unsigned;
-        }
-    };
+	($signed:ty, $unsigned:ty) => {
+		impl ZigZag for $signed {
+			type UInt = $unsigned;
+		}
+	};
 }
 
 impl_zigzag!(i8, u8);
@@ -48,36 +47,28 @@ impl_zigzag!(i64, u64);
 impl_zigzag!(i128, u128);
 impl_zigzag!(isize, usize);
 
-
 #[cfg(test)]
 mod tests {
 	use super::*;
 	use pretty_assertions::assert_eq;
 	use rayon::prelude::*;
 
-
 	#[test]
 	fn i16_values() {
-		(i16::MIN..=i16::MAX)
-			.into_par_iter()
-			.for_each(|i| {
-				let i = i;
-				let zig = ZigZag::encode(i);
-				let zag = ZigZag::decode(zig);
-				assert_eq!(i, zag);
-			});
+		(i16::MIN..=i16::MAX).into_par_iter().for_each(|i| {
+			let zig = ZigZag::encode(i);
+			let zag = ZigZag::decode(zig);
+			assert_eq!(i, zag);
+		});
 	}
 
 	#[test]
 	fn i8_values() {
-		(i8::MIN as i16..=i8::MAX as i16)
-			.into_par_iter()
-			.for_each(|i| {
-				let i = i as i8;
-				let zig = ZigZag::encode(i);
-				let zag = ZigZag::decode(zig);
-				assert_eq!(i, zag);
-			});
+		(i8::MIN..=i8::MAX).into_par_iter().for_each(|i| {
+			let zig = ZigZag::encode(i);
+			let zag = ZigZag::decode(zig);
+			assert_eq!(i, zag);
+		});
 	}
 
 	#[test]
