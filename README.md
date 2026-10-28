@@ -1,6 +1,23 @@
 # zigzag-rs
 
-A small crate to encode and decode integers using zigzag.
+Zigzag encoding/decoding for primitive integers.
+
+## Usage
+
+```rust
+use zigzag_rs::ZigZag;
+
+let encoded: u32 = i32::encode(-3);
+assert_eq!(encoded, 5);
+assert_eq!(i32::decode(encoded), -3);
+```
+
+`ZigZag` is implemented for `i8`, `i16`, `i32`, `i64`, `i128` and `isize`,
+each paired with the unsigned type of the same width.
+
+## Features
+
+- `#![no_std]`
 
 ---
 
